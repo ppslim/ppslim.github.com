@@ -1,0 +1,18 @@
+<html>
+<head>
+	<link href="/lib/css/nabnotify.css" rel="stylesheet" type="text/css" />
+	<script type="text/javascript" src="/lib/jquery/jquery-1.7.2.min.js"></script>
+	<script type="text/javascript" src="/lib/jquery/jquery.notify.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function () {
+			$('.notification.autonabSticky').notify();
+		});
+	</script>
+</head>
+<body>
+<div class="notification autonabSticky hide">
+	<p>Sabconnect++ can setup to work with this site. What would you like to do:
+	<a href="javascript:" id="autonabEnable">Enable</a> | <a href="javascript:" id="autonabIgnore">Ignore</a>
+	</p>
+	<a class="close" href="javascript:"><div class="autonabStickyClose"></div></a>
+</div>
