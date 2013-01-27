@@ -1,0 +1,238 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+	<title>CSC Tools:: Tags checker</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+	<link href="/css/default.css" type="text/css" rel="stylesheet" />
+</head>
+<body>
+<div id="container">
+	<!-- begin top rounded corner styles -->
+	<b class="rtop"><b class="r1"></b><b class="r2"></b> <b class="r3"></b> <b class="r4"></b></b>
+	<!-- end top rounded corner styles -->
+	<div id="pageHeader">CSC Tools</div>
+	<div id="divPageContent">
+	{include file="navigation_bar.tpl"}
+		<table border="0" cellpadding="5" cellspacing="0">
+			<tr>
+					<td valign="top" class="leftColumn">
+						<div id="sideBarNews">
+							<div id="newsHeader">Tags</div>
+							<div id="sideBarNewsContent">
+								<div class="newsItem">This tools shows information about tags on the line<br /><br /> Tags: 08000853608 opt 3<br />O/M: O/M35912800
+									<div id="boxLink"><a href="?">New Check</a></div>
+									<div id="boxSrch" style="display:none"><form action="?" method="POST"><input type="hidden" name="activeCheck" value="1"><input type="text" name="telNo" id="boxTelInput">
+										<span id="boxBtn"><input type="submit" value="go" id="boxBtnBtn"></span>
+										<span id="boxTrb" style="display:none"><img src="../static/throbber.gif"></span>
+										</form>
+									</div>
+								</div>
+							</div>
+						</div>
+					</td>
+					<td valign="top" class="rightColumn">
+						{if $isActiveCheck eq false}
+
+						<h2>Tag checker</h2>
+
+						<p>Enter a phone number to tag check</p>
+						<form method="POST" action="?">
+						<input type="hidden" name="activeCheck" value="1">
+						<strong>Number: <input type="text" name="telNo"> <input type="submit" value="Check"><br />
+						MAC Key: <input type="text" name="macKey">
+						</form>
+
+						{else}
+
+						<h2>Tags checker results</h2>
+
+						{if $isXmlError eq true }
+						{if $xmlErrorType eq "ERROR_MAJOR"}
+						<p class="subHeaderError">Result: Major Error</p>
+						<p>{$xmlErrorMsg}</p>
+						<p>{$xmlErrorCode}</p>
+						{else}
+						<p class="subHeaderError">Result: {$numberChecked} {if $macKey ne ""}({$macKey}){/if}</p>
+						<p>{$xmlErrorMsg}</p>
+						{/if}
+						{* Otherwise need to run the correct results *}
+						{else}
+						<p class="subHeader" id="mktChk">Result: {$numberChecked} {if $macKey ne ""}({$macKey}){/if}
+						{if $vpContention eq "Y"}
+							(VP is RED)
+						{/if}
+						</p>
+
+					<table border="1" class="resultOutput">
+						<tr>
+							<td class="prodHead">Product:</td>
+							<td class="prodHead">Details:</td>
+							<td class="prodHead">Speeds:</td>
+						</tr>
+						{section name=tagsBody loop=$sData}
+						<tr>
+							<td class="prodName">{$sData[tagsBody].product}</td>
+							<td valign="top" class="prodInfo">
+								<table border="0" cellpadding="0" cellspacing="1">
+								<tr><td><strong>Product status: </strong></td><td>
+								{if $sData[tagsBody].status eq "E"}
+                                                                     Enabled
+                                                                {elseif $sData[tagsBody].status eq "H"}
+                                                                     Not Viable
+                                                                {elseif $sData[tagsBody].status eq "L"}
+                                                                     Exchange activate
+                                                                {elseif $sData[tagsBody].status eq "N"}
+                                                                     Not planned
+                                                                {elseif $sData[tagsBody].status eq "P"}
+                                                                     Planned
+                                                                {elseif $sData[tagsBody].status eq "S"}
+                                                                     Exchange activate - Will be Enabled
+                                                                {else}
+                                                                     Unknown status {$sData[tagsBody].status}
+                                                                {/if}
+								</td></tr>
+								<tr><td><strong>Product RAG: </strong></td><td>
+                                                                {if $sData[tagsBody].rag_output eq "G"}
+                                                                     Green
+                                                                {elseif $sData[tagsBody].rag_output eq "A"}
+                                                                     Amber
+                                                                {elseif $sData[tagsBody].rag_output eq "R"}
+                                                                     Red
+                                                                {else}
+                                                                     Unknown {$sData[tagsBody].rag_output}
+                                                                {/if}
+								</td></tr>
+								{if ( $sData[tagsBody].status ne "N" ) and ( $sData[tagsBody].status ne "H" ) and ( $sData[tagsBody].status ne "" )}
+									<tr><td><strong>Reason code: </strong></td><td>{$sData[tagsBody].reason} - {$sData[tagsBody].reason_conv}</td></tr>
+								{/if}
+								{if ( $sData[tagsBody].status eq "P" ) and ( $sData[tagsBody].ready_date ne "" )}
+                                                                     <tr><td><strong>Ready date: </strong></td><td>{$sData[tagsBody].ready_date}</td></tr>
+                                                                {/if}
+                                                                {if ( $sData[tagsBody].product eq "FTTC" ) and ( $sData[tagsBody].pcpid ne "" )}
+                                                                     <tr><td><strong>CAB #: </strong></td><td>{$sData[tagsBody].pcpid}</td></tr>
+                                                                {/if}
+                                                                {if $sData[tagsBody].product eq "FTTP"}
+                                                                     <tr><td><strong>Property type: </strong></td><td>{$sData[tagsBody].propertytype}</td></tr>
+                                                                     <tr><td><strong>Notes: </strong></td><td>{$sData[tagsBody].servicenotes}</td></tr>
+                                                                     <tr><td><strong>Minimum leadtime: </strong></td><td>{$sData[tagsBody].leadtime}</td></tr>
+                                                                     <tr><td><strong>Install type: </strong></td><td>{$sData[tagsBody].installtype}</td></tr>
+                                                                {/if}
+								</table>
+							</td>
+							<td valign="top" class="prodSpeed">
+								{if $sData[tagsBody].line_rate ne ""}
+								<table border="0" cellspacing="1" cellpadding="0">
+                                                                     <tr><td><strong>Speed: </strong></td><td>{$sData[tagsBody].line_rate}</td></tr>
+                                                                     {if $sData[tagsBody].line_rate_up ne ""}
+                                                                          <tr><td><strong>Upstream: </strong></td><td>{$sData[tagsBody].line_rate_up}</td></tr>
+                                                                     {/if}
+                                                                     {if ($sData[tagsBody].line_rate_min ne "") AND ($sData[tagsBody].line_rate_max ne "")}
+                                                                          <tr><td><strong>Min: </strong></td><td>{$sData[tagsBody].line_rate_min}</td></tr>
+                                                                          <tr><td><strong>Max: </strong></td><td>{$sData[tagsBody].line_rate_max}</td></tr>
+                                                                     {/if}
+								</table>
+                                                                {/if}
+							</td>
+						</tr>
+						{/section}
+					</table>
+	
+
+
+					<table border="0" class="resultOutput">
+						<tr>
+							<th valign="top" align="right">Exchange:</th>
+							<td>({$exchCode}) {$exchName}</td>
+						</tr>
+						<tr>
+							<th valign="top" align="right">Postcode:</th>
+							<td>
+								{if $userPostcode neq "" || $userPostcode neq " "}
+									{$userPostcode} <a href="http://maps.google.co.uk/maps?q={$userPostcode}" target="_blank">[map]</a>
+								{else}
+									{$userPostcode}
+								{/if}
+							</td>
+						</tr>
+						{if $provCAD ne ""}
+						<tr>
+							<th valign="top" align="right">Order&nbsp;complete&nbsp;date:</th>
+							<td>{$provCAD}</td>
+						</tr>
+						{/if}
+						<tr>
+							<th valign="top" align="right">Service&nbsp;provider:</th>
+							<td>{$tagsSP}</td>
+						</tr>
+						{if $tagsCPno ne "XXX"}
+						<tr>
+							<td>&nbsp;</td>
+							<td>
+								<form action="?" method="post">
+								<input type="hidden" name="activeCheck" value="1">
+								<input type="hidden" name="telNo" value="{$numberChecked}">
+								<div id="macLink"><a href="?" id="macLinkA">Check MAC</a></div>
+								<div id="macInput" style="display:none">
+									<strong>MAC:</strong> <input type="text" name="macKey" id="macInputBox">
+									<span id="macSearchBut"><input type="submit" value="Check" id="macSearchButBut"></span>
+									<span id="macSearchImg" style="display:none"><img src="../static/throbber.gif"></span>
+								</div>
+								<div id="macSearch" style="display:none"></div>
+								<div id="macOutput" style="display:none"></div>
+								</form>
+							</td>
+						</tr>
+						{/if}
+						<tr>
+							<th valign="top" align="right">Carrier&nbsp;provider:</th>
+							<td>{$tagsCP}</td>
+						</tr>
+						<tr>
+							<th valigh="top" align="right">Carrier&nbsp;contact&nbsp;#:</th>
+							<td>{$tagsCPno}</td>
+						</tr>
+						{if $macKey ne ""}
+						<tr>
+							<th valign="top" align="right">MAC&nbsp;Code:</th>
+							<td>{$macKey}</td>
+						</tr>
+						<tr>
+							<th valign="top" align="right">MAC&nbsp;Valid:</th>
+							<td>{$macCodeValid}</td>
+						</tr>
+						{if $macCodeValid eq "Y"}
+						<tr>
+							<th valign="top" align="right">MAC&nbsp;Expiry:</th>
+							<td>{$macExpiryDate}</td>
+						</tr>
+						{/if}
+						<tr>
+							<th valign="top" align="right">MAC&nbsp;Info:</th>
+							<td>{$macReasonCode}</td>
+						</tr>
+						{/if}
+						<tr>
+							<th valign="top" align="right">Suggested&nbsp;message:</th>
+							<td>{$tagsMainMessage}</td>
+						</tr>
+						<tr>
+							<th valign="top" align="right">Supplimentary&nbsp;message:</th>
+							<td>{$tagsSubMessage}</td>
+						</tr>
+					</table>
+					{/if}
+					{/if}
+
+					</td>
+			</tr>
+		</table>
+	</div>
+	<div id="divBaseLinks"><a href="/index.html">Home</a> | <a href="/sitemap.html">Sitemap</a> | <a href="contact.html">Contact</a> | Query ID: {$queryId}</div>
+	<!-- begin bottom rounded corner styles -->
+	<b class="rbottom"><b class="r4"></b> <b class="r3"></b> <b class="r2"></b> <b class="r1"></b></b>
+	<!-- end bottom rounded corner styles -->
+</div> 
+<div class="spacer">&nbsp;</div>
+</body>
+</html>
